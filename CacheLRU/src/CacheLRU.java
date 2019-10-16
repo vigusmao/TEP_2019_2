@@ -1,14 +1,20 @@
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class CacheLRU<K, V> {
 
-    private Map<K, V> mapa;
+    private LinkedHashMap<K, V> mapa;
     private int capacidade;
 
     public CacheLRU(int capacidade) {
         this.capacidade = capacidade;
-        mapa = new HashMap<>();
+        mapa = new LinkedHashMap<>(capacidade, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
+                return this.size() > CacheLRU.this.capacidade;
+            }
+        };
     }
 
     /**
@@ -31,10 +37,6 @@ public class CacheLRU<K, V> {
      * @param documento O documento em si.
      */
     public void put(K chave, V documento) {
-        if (size() == capacidade) {
-            mapa.remove(mapa.keySet().toArray()[0]);
-
-        }
         mapa.put(chave, documento);
     }
 
